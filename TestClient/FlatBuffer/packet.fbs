@@ -1,0 +1,21 @@
+﻿namespace PortfolioRealtime.FlatBuffers;
+
+table HeartbeatPacket {
+}
+
+table ChatMessagePacket {
+    timestamp: long;
+    message: string;
+    to: string;
+}
+
+union PacketType {
+    Heartbeat: HeartbeatPacket,
+    ChatMessage: ChatMessagePacket
+}
+
+table Packet {
+    data: PacketType;
+}
+
+root_type Packet;
