@@ -1,6 +1,4 @@
-﻿# 포트폴리오용 실시간 서버
-
----
+# 포트폴리오용 실시간 서버
 
 Websocket + Flatbuffers + C#
 
@@ -19,6 +17,8 @@ Websocket + Flatbuffers + C#
 - [ ] 로그인
 - [ ] 인벤토리
 - [ ] TCP 서버로 전환
+
+![image](https://user-images.githubusercontent.com/42506968/232533931-aa35818e-aef2-4c5d-9e7b-5ffd2dbeae54.png)
 
 ### Dev Log
 **2023-04-18**: 첫 개발 시작
