@@ -19,22 +19,28 @@ internal static class PacketSenderService
         while (true)
             try
             {
-                foreach (var tuple in Sessions)
+                lock (Lock)
                 {
-                    if (tuple.sendQueue.Count == 0)
-                        continue;
+                    foreach (var tuple in Sessions)
+                    {
+                        if (tuple.sendQueue.Count == 0)
+                            continue;
 
-                    var packet = tuple.sendQueue.Dequeue();
-                    var buffer = packet.ByteBuffer;
-                    await tuple.session.Socket.SendAsync(
-                        buffer.ToArraySegment(buffer.Position, buffer.Length - buffer.Position),
-                        WebSocketMessageType.Binary, true,
-                        CancellationToken.None);
+                        var packet = tuple.sendQueue.Dequeue();
+                        var buffer = packet.ByteBuffer;
+#pragma warning disable CS4014
+                        tuple.session.Socket.SendAsync(
+                            buffer.ToArraySegment(buffer.Position, buffer.Length - buffer.Position),
+                            WebSocketMessageType.Binary, true,
+                            CancellationToken.None);
+                    }
                 }
+
+                await Task.Yield();
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Logger.LogError(e.ToString());
             }
     }
 
@@ -58,7 +64,8 @@ internal static class PacketSenderService
     {
         lock (Lock)
         {
-            Sessions.Find(tuple => tuple.session == session).sendQueue.Enqueue(packet);
+            var item = Sessions.Find(tuple => tuple.session == session);
+            item.sendQueue.Enqueue(packet);
         }
     }
 }

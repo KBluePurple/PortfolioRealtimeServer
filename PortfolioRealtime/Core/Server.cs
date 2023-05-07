@@ -28,7 +28,7 @@ internal class Server
         _listener.Prefixes.Add($"http://localhost:{_port}/");
         _listener.Start();
         _isListening = true;
-        Logger.LogInfo("Server started.");
+        Logger.LogInfo($"Server started on port {_port}.");
 
         while (_isListening)
         {

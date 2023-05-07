@@ -27,3 +27,12 @@ Websocket + Flatbuffers + C#
 - 세션 구현
 - Flatbuffers 패킷 처리
 - Heartbeat 처리
+
+**2023-05-07**: HeartHeat 서비스 개편
+- 로그 파일 기록 기능
+- 기존 Heartbeat는 1초마다 모두에게 한번에 보내는 방식이었음
+- 이는 세션 수가 많아질수록 성능 저하를 가져옴
+- 이를 개선하기 위해 Heartbeat 서비스를 개편함
+- 서버에 Tick을 두고, Session 마다 타이머를 두어 시간을 측정함
+- Tick이 지날 때마다 Session의 타이머를 감소시킴
+- 타이머가 0이 되면 해당 Session에게 Heartbeat 패킷을 보냄

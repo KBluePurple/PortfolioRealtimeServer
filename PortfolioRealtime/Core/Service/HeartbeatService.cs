@@ -26,41 +26,44 @@ internal static class HeartbeatService
         while (true)
             try
             {
-                foreach (var tuple in Sessions)
+                lock (Lock)
                 {
-                    if (tuple.Session.Socket.State != WebSocketState.Open)
+                    foreach (var tuple in Sessions)
                     {
-                        SessionsToRemove.Add(tuple.Session);
-                        continue;
+                        if (tuple.Session.Socket.State != WebSocketState.Open)
+                        {
+                            SessionsToRemove.Add(tuple.Session);
+                            continue;
+                        }
+
+                        if (tuple.IsAlive == false)
+                        {
+                            SessionsToRemove.Add(tuple.Session);
+                            continue;
+                        }
+
+                        var builder = new FlatBufferBuilder(1);
+
+                        HeartbeatPacket.StartHeartbeatPacket(builder);
+                        var heartbeatPacket = HeartbeatPacket.EndHeartbeatPacket(builder);
+                        Packet.StartPacket(builder);
+                        Packet.AddDataType(builder, PacketType.Heartbeat);
+                        Packet.AddData(builder, heartbeatPacket.Value);
+                        var packet = Packet.EndPacket(builder);
+                        builder.Finish(packet.Value);
+
+                        tuple.Session.Send(Packet.GetRootAsPacket(builder.DataBuffer));
+                        SetSessionAlive(tuple.Session, false);
+                        Logger.LogDebug($"Heartbeat sent to {tuple.Session}.");
                     }
-
-                    if (tuple.IsAlive == false)
-                    {
-                        SessionsToRemove.Add(tuple.Session);
-                        continue;
-                    }
-
-                    var builder = new FlatBufferBuilder(1);
-
-                    HeartbeatPacket.StartHeartbeatPacket(builder);
-                    var heartbeatPacket = HeartbeatPacket.EndHeartbeatPacket(builder);
-                    Packet.StartPacket(builder);
-                    Packet.AddDataType(builder, PacketType.Heartbeat);
-                    Packet.AddData(builder, heartbeatPacket.Value);
-                    var packet = Packet.EndPacket(builder);
-                    builder.Finish(packet.Value);
-
-                    tuple.Session.Send(Packet.GetRootAsPacket(builder.DataBuffer));
-                    SetSessionAlive(tuple.Session, false);
-                    Logger.LogDebug($"Heartbeat sent to {tuple.Session}.");
                 }
 
                 await Task.Delay(HeartbeatDelay, CancellationToken);
                 CleanupSessions();
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Logger.LogError(e.ToString());
             }
     }
 
@@ -96,23 +99,23 @@ internal static class HeartbeatService
         }
     }
 
-    private class SessionAlive
-    {
-        public SessionAlive(Session session, bool isAlive)
-        {
-            Session = session;
-            IsAlive = isAlive;
-        }
-
-        public readonly Session Session;
-        public bool IsAlive;
-    }
-
     public static void RemoveSession(Session session)
     {
         lock (Lock)
         {
             Sessions.Remove(Sessions.First(x => x.Session == session));
+        }
+    }
+
+    private class SessionAlive
+    {
+        public readonly Session Session;
+        public bool IsAlive;
+
+        public SessionAlive(Session session, bool isAlive)
+        {
+            Session = session;
+            IsAlive = isAlive;
         }
     }
 }
