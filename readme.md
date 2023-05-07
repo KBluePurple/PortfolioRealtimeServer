@@ -27,6 +27,7 @@ Websocket + Flatbuffers + C#
 - 세션 구현
 - Flatbuffers 패킷 처리
 - Heartbeat 처리
+![](https://i.imgur.com/nZK1G8W.gifv)
 
 **2023-05-07**: HeartHeat 서비스 개편
 - 로그 파일 기록 기능
