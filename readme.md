@@ -18,8 +18,6 @@ Websocket + Flatbuffers + C#
 - [ ] 인벤토리
 - [ ] TCP 서버로 전환
 
-![image](https://user-images.githubusercontent.com/42506968/232533931-aa35818e-aef2-4c5d-9e7b-5ffd2dbeae54.png)
-
 ### Dev Log
 **2023-04-18**: 첫 개발 시작
 - 세션 구현
