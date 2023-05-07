@@ -28,7 +28,7 @@ Websocket + Flatbuffers + C#
 
 ![image](https://user-images.githubusercontent.com/42506968/236685604-21901ee6-51c2-4d80-bf56-a3101e2365a2.gif)
 
-**2023-05-07**: HeartHeat 서비스 개편
+**2023-05-07**: HeartHeat 서비스 개편 계획
 - 로그 파일 기록 기능
 - 기존 Heartbeat는 1초마다 모두에게 한번에 보내는 방식이었음
 - 이는 세션 수가 많아질수록 성능 저하를 가져옴
